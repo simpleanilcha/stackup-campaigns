@@ -9,6 +9,7 @@ function App() {
  const [adminAddr, setAdminAddr] = useState("nil");
  const [currentAccount, setCurrentAccount] = useState(null);
  const [allQuestsInfo, setAllQuestsInfo] = useState(null);
+ const [userQuestStatuses, setUserQuestStatuses] = useState(null);
 
  const connectWalletHandler = async () => {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
@@ -59,9 +60,46 @@ function App() {
   }
  };
 
+ const getUserQuestStatuses = async () => {
+  try {
+   if (currentAccount) {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const stackupContract = new ethers.Contract(contractAddr, abi, provider);
+
+    const nextQuestId = await stackupContract.nextQuestId();
+    const questStatusMapping = {
+     0: "Not Joined",
+     1: "Joined",
+     2: "Submitted",
+    };
+    let userQuestStatuses = [];
+    let thisQuest;
+
+    for (let i = 0; i < nextQuestId; i++) {
+     let thisQuestStatus = [];
+     thisQuest = await stackupContract.quests(i);
+
+     let thisQuestTitle = thisQuest[2];
+     let thisQuestId = thisQuest[0];
+
+     thisQuestStatus.push(thisQuestTitle);
+     const questStatusId = await stackupContract.playerQuestStatuses(currentAccount, thisQuestId);
+     thisQuestStatus.push(questStatusMapping[questStatusId]);
+
+     userQuestStatuses.push(thisQuestStatus);
+    }
+    setUserQuestStatuses(userQuestStatuses);
+   }
+  } catch (err) {
+   console.log("getUserQuestStatuses error...");
+   console.log(err);
+  }
+ };
+
  useEffect(() => {
   getAdminAddr();
   getQuestsInfo();
+  getUserQuestStatuses();
  });
 
  return (
@@ -89,6 +127,23 @@ function App() {
        </div>
       );
      })}
+   </div>
+   <h2>
+    <u>Your Quest Statuses:</u>
+   </h2>
+   <div>
+    <ul>
+     {userQuestStatuses &&
+      userQuestStatuses.map((quest) => {
+       return (
+        <div>
+         <li>
+          {quest[0]} - {quest[1]}
+         </li>
+        </div>
+       );
+      })}
+    </ul>
    </div>
   </div>
  );
