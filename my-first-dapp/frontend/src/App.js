@@ -10,6 +10,7 @@ function App() {
  const [currentAccount, setCurrentAccount] = useState(null);
  const [allQuestsInfo, setAllQuestsInfo] = useState(null);
  const [userQuestStatuses, setUserQuestStatuses] = useState(null);
+ const [questId, setQuestId] = useState(null);
 
  const connectWalletHandler = async () => {
   if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
@@ -96,6 +97,23 @@ function App() {
   }
  };
 
+ const joinQuestHandler = async () => {
+  try {
+   if (!questId) {
+    alert("input quest ID before proceeding");
+   } else {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const stackupContract = new ethers.Contract(contractAddr, abi, signer);
+    const tx = await stackupContract.joinQuest(questId);
+    await tx.wait();
+   }
+  } catch (err) {
+   console.log(err);
+   alert("error encountered! refer to console log to debug");
+  }
+ };
+
  useEffect(() => {
   getAdminAddr();
   getQuestsInfo();
@@ -144,6 +162,13 @@ function App() {
        );
       })}
     </ul>
+   </div>
+   <h2>
+    <u>Actions:</u>
+   </h2>
+   <div>
+    <input type="text" placeholder="Quest Id" value={questId} onChange={(e) => setQuestId(e.target.value)} />
+    <button onClick={joinQuestHandler}>Join Quest</button>
    </div>
   </div>
  );
