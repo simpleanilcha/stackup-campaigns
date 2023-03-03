@@ -114,16 +114,34 @@ function App() {
   }
  };
 
+ const submitQuestHandler  = async () => {
+  try {
+    if (!questId) {
+     alert("input quest ID before proceeding");
+    } else {
+     const provider = new ethers.providers.Web3Provider(window.ethereum);
+     const signer = provider.getSigner();
+     const stackupContract = new ethers.Contract(contractAddr, abi, signer);
+     const tx = await stackupContract.submitQuest(questId);
+     await tx.wait();
+    }
+   } catch (err) {
+    console.log(err);
+    alert("error encountered! refer to console log to debug");
+   }
+ }
+
  useEffect(() => {
   getAdminAddr();
   getQuestsInfo();
   getUserQuestStatuses();
+  // submitQuestHandler();
  });
 
  return (
   <div className="container">
    <h1>Build Your First Dapp</h1>
-   <h4>By: REPLACE-WITH-YOUR-STACKUP-USERNAME</h4>
+   <h4>By: anilcha</h4>
    {currentAccount ? <h4>Wallet connected: {currentAccount}</h4> : <button onClick={connectWalletHandler}>Connect Wallet</button>}
    <h4>Admin address: {adminAddr}</h4>
    <h2>
@@ -169,6 +187,7 @@ function App() {
    <div>
     <input type="text" placeholder="Quest Id" value={questId} onChange={(e) => setQuestId(e.target.value)} />
     <button onClick={joinQuestHandler}>Join Quest</button>
+    <button onClick={submitQuestHandler}>Submit Quest</button>
    </div>
   </div>
  );
