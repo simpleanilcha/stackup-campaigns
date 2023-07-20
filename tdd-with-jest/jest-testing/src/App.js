@@ -1,25 +1,23 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
 
-function App() {
+const App = () => {
+  const [heading, setHeading] = useState("Logged Out");
+
+  const onClick = () => {
+    setHeading("Logged In");
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <button type="button" onClick={onClick}>
+        Log In
+      </button>
+      <h1>{heading}</h1>
+    </>
   );
-}
+};
 
+export const Title = () => {
+  return <h1>Hello</h1>
+}
 export default App;
